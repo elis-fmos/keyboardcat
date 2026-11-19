@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Touch Piano</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#111827;
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    overflow:hidden;
+    height:100vh;
+    touch-action:none;
+}
+
+.header{
+    height:90px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    padding:10px;
+}
+
+select,input,button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    font-weight:bold;
+}
+
+button.active{
+    background:#10b981;
+}
+
+.keyboard{
+    position:relative;
+    height:calc(100vh - 90px);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    overflow:hidden;
+}
+
+.white-key{
+    width:65px;
+    height:100%;
+    max-height:500px;
+    background:white;
+    border:1px solid #222;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:black;
+    padding-bottom:15px;
+    user-select:none;
+}
+
+.white-key.active{
+    background:#dbeafe;
+    box-shadow:inset 0 0 20px #3b82f6;
+}
+
+.black-key{
+    position:absolute;
+    width:40px;
+    height:300px;
+    background:#111;
+    border-radius:0 0 8px 8px;
+    z-index:5;
+    color:white;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    padding-bottom:10px;
+    font-size:12px;
+}
+
+.black-key.active{
+    background:#2563eb;
+}
+
+.label{
+    pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+
+<select id="instrument">
+    <option value="piano">Piano</option>
+    <option value="organ">Organ</option>
+    <option value="synth">Synth Pad</option>
+    <option value="strings">Strings</option>
+</select>
+
+<label>
+Volume
+<input type="range"
+id="volume"
+min="-35"
+max="0"
+value="-8">
+</label>
+
+<button id="sustainBtn">
+Sustain OFF
+</button>
+
+</div>
+
+<div class="keyboard" id="keyboard"></div>
+
+<script>
+
+const keyboard=document.getElementById("keyboard");
+let sustain=false;
+
+document.getElementById("sustainBtn")
+.addEventListener("click",()=>{
+
+sustain=!sustain;
+
+const btn=document.getElementById("sustainBtn");
+
+btn.classList.toggle("active");
+
+btn.textContent=sustain
+? "Sustain ON"
+: "Sustain OFF";
+
+});
+
+const notes=[
+"C3","C#3","D3","D#3","E3",
+"F3","F#3","G3","G#3","A3","A#3","B3",
+"C4","C#4","D4","D#4","E4",
+"F4","F#4","G4","G#4","A4","A#4","B4",
+"C5","C#5","D5","D#5","E5",
+"F5","F#5","G5","G#5","A5","A#5","B5"
+];
+
+let synth;
+
+function createInstrument(type){
+
+if(synth){
+    synth.dispose();
+}
+
+switch(type){
+
+case "organ":
+
+synth=new Tone.PolySynth(
+Tone.Synth,
+{
+oscillator:{
+type:"square"
+},
+envelope:{
+attack:0.02,
+decay:0.1,
+sustain:1,
+release:0.4
+}
+}
+).toDestination();
+
+break;
+
+case "strings":
+
+synth=new Tone.PolySynth(
+Tone.Synth,
+{
+oscillator:{
+type:"sawtooth"
+},
+envelope:{
+attack:0.3,
+decay:0.2,
+sustain:0.8,
+release:1.5
+}
+}
+).toDestination();
+
+break;
+
+case "synth":
+
+synth=new Tone.PolySynth(
+Tone.Synth,
+{
+oscillator:{
+type:"triangle"
+},
+envelope:{
+attack:0.1,
+decay:0.1,
+sustain:0.7,
+release:0.8
+}
+}
+).toDestination();
+
+break;
+
+default:
+
+synth=new Tone.PolySynth(
+Tone.Synth,
+{
+oscillator:{
+type:"triangle"
+},
+envelope:{
+attack:0.01,
+decay:0.15,
+sustain:0.4,
+release:1.2
+}
+}
+).toDestination();
+
+}
+}
+
+createInstrument("piano");
+
+document
+.getElementById("instrument")
+.addEventListener("change",e=>{
+createInstrument(e.target.value);
+});
+
+const volumeControl=
+document.getElementById("volume");
+
+volumeControl.addEventListener("input",()=>{
+Tone.Destination.volume.value=
+volumeControl.value;
+});
+
+Tone.Destination.volume.value=-8;
+
+let whiteIndex=0;
+
+notes.forEach(note=>{
+
+const isBlack=note.includes("#");
+
+const key=document.createElement("div");
+
+key.dataset.note=note;
+
+if(isBlack){
+
+key.className="black-key";
+
+key.style.left=
+`${whiteIndex*65-20}px`;
+
+}
+else{
+
+key.className="white-key";
+
+whiteIndex++;
+
+}
+
+const label=document.createElement("div");
+label.className="label";
+label.textContent=note.replace(/[0-9]/g,'');
+
+key.appendChild(label);
+
+keyboard.appendChild(key);
+
+});
+
+async function startAudio(){
+
+await Tone.start();
+
+}
+
+const active=new Set();
+
+function noteOn(key){
+
+startAudio();
+
+const note=key.dataset.note;
+
+if(active.has(note)) return;
+
+active.add(note);
+
+key.classList.add("active");
+
+synth.triggerAttack(note);
+
+}
+
+function noteOff(key){
+
+const note=key.dataset.note;
+
+active.delete(note);
+
+key.classList.remove("active");
+
+if(!sustain){
+
+synth.triggerRelease(note);
+
+}
+
+}
+
+keyboard.querySelectorAll(
+".white-key,.black-key"
+).forEach(key=>{
+
+key.addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+noteOn(key);
+}
+);
+
+key.addEventListener(
+"pointerup",
+()=>{
+noteOff(key);
+}
+);
+
+key.addEventListener(
+"pointerleave",
+()=>{
+if(active.has(key.dataset.note)){
+noteOff(key);
+}
+}
+);
+
+});
+
+window.addEventListener(
+"pointerup",
+()=>{
+active.forEach(note=>{
+synth.triggerRelease(note);
+});
+active.clear();
+
+document
+.querySelectorAll(".active")
+.forEach(k=>{
+k.classList.remove("active");
+});
+}
+);
+
+</script>
+
+</body>
+</html>
