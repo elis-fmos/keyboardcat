@@ -25,8 +25,8 @@ const synth = new Tone.Sampler({
     urls: {
 
         C4: "C4vL.wav",
-        "D#4": "Ds4vL.wav",
-        "F#4": "Fs4vL.wav",
+        "D#4": "D#4vL.wav",
+        "F#4": "F#4vL.wav",
         A4: "A4vL.wav",
         C5: "C5vL.wav"
 
@@ -37,8 +37,6 @@ const synth = new Tone.Sampler({
     baseUrl: "samples/piano/"
 
 }).toDestination();
-
-Tone.Destination.volume.value = -8;
 
 /* ==========================
    CONTROLS
