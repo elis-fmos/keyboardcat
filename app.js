@@ -24,7 +24,11 @@ Tone.Destination.volume.value=e.target.value;
 
 document.getElementById("playMode")
 .addEventListener("change",e=>{
-playMode=e.target.value;
+
+    stopAll();
+
+    playMode=e.target.value;
+
 });
 
 document.getElementById("toggleSidebar")
