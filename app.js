@@ -1,39 +1,16 @@
 const display = document.getElementById("display");
 
-const sidebar =
-document.getElementById("sidebar");
-
 const whiteKeys =
 document.getElementById("whiteKeys");
 
 const blackKeys =
 document.getElementById("blackKeys");
 
-/* ======================
-   Hljóð
-====================== */
-
 let playMode = "fade";
 
-const synth = new Tone.Sampler({
-
-    urls: {
-
-        C4: "C4vL.wav",
-        "D#4": "D#4vL.wav",
-        "F#4": "F#4vL.wav",
-        A4: "A4vL.wav",
-        C5: "C5vL.wav"
-
-    },
-
-    release: 2,
-
-    baseUrl: "samples/piano/"
-
-}).toDestination();
-
-Tone.Destination.volume.value = -8;
+/* ==========================
+   AUDIO
+========================== */
 
 async function startAudio(){
 
@@ -43,68 +20,92 @@ async function startAudio(){
 
 }
 
-/* ======================
-   Stjórntæki
-====================== */
+const synth = new Tone.PolySynth(
+    Tone.Synth,
+    {
+        envelope:{
+            attack:0.01,
+            decay:0.2,
+            sustain:0.25,
+            release:3
+        }
+    }
+).toDestination();
+
+Tone.Destination.volume.value = -8;
+
+/* ==========================
+   CONTROLS
+========================== */
 
 document
 .getElementById("volume")
-.addEventListener(
-"input",
-e=>{
+.addEventListener("input",e=>{
 
     Tone.Destination.volume.value =
     Number(e.target.value);
 
 });
 
+/* ==========================
+   MODE BUTTONS
+========================== */
+
 document
-.getElementById("playMode")
-.addEventListener(
-"change",
-e=>{
+.querySelectorAll(".modeButton")
+.forEach(button=>{
 
-    stopAll();
+    button.addEventListener(
+    "click",
 
-    playMode =
-    e.target.value;
+    ()=>{
 
-    display.textContent =
-    `🎹 Hamur: ${playMode}`;
+        stopAll();
+
+        document
+        .querySelectorAll(".modeButton")
+        .forEach(btn=>{
+
+            btn.classList.remove(
+                "active"
+            );
+
+        });
+
+        button.classList.add(
+            "active"
+        );
+
+        playMode =
+        button.dataset.mode;
+
+        display.textContent =
+        `🎹 ${playMode.toUpperCase()} hamur`;
+
+    });
 
 });
 
-document
-.getElementById("toggleSidebar")
-.addEventListener(
-"click",
-()=>{
-
-    sidebar.classList.toggle(
-        "hidden"
-    );
-
-});
-
-/* ======================
-   Hjálparföll
-====================== */
+/* ==========================
+   HELPERS
+========================== */
 
 function stopAll(){
 
     try{
         synth.releaseAll();
-    }
-    catch(e){}
+    }catch(e){}
 
     clearHighlights();
 
     document
     .querySelectorAll(".active")
     .forEach(el=>{
+
         el.classList.remove(
             "active"
         );
+
     });
 
 }
@@ -115,9 +116,9 @@ function clearHighlights(){
     .querySelectorAll(
         ".chord-highlight"
     )
-    .forEach(key=>{
+    .forEach(el=>{
 
-        key.classList.remove(
+        el.classList.remove(
             "chord-highlight"
         );
 
@@ -156,9 +157,7 @@ function playNotes(notes){
 
     }
 
-    synth.triggerAttack(
-        notes
-    );
+    synth.triggerAttack(notes);
 
 }
 
@@ -168,15 +167,13 @@ function releaseNotes(notes){
         return;
     }
 
-    synth.triggerRelease(
-        notes
-    );
+    synth.triggerRelease(notes);
 
 }
 
-/* ======================
-   Hljómar
-====================== */
+/* ==========================
+   CHORDS
+========================== */
 
 const chordData = {
 
@@ -218,10 +215,15 @@ seven:[
 
 };
 
+function colourClass(root){
+
+    return "key-" + root;
+
+}
+
 function addChordButtons(
 containerId,
 chords,
-cssClass,
 typeLabel
 ){
 
@@ -238,7 +240,7 @@ typeLabel
         );
 
         btn.className =
-        `chordButton ${cssClass}`;
+        `chordButton ${colourClass(chord[0][0])}`;
 
         btn.textContent =
         chord[0];
@@ -250,18 +252,15 @@ typeLabel
 
             await startAudio();
 
-            const notes =
-            chord[1];
-
             highlightNotes(
-                notes
+                chord[1]
             );
 
             display.textContent =
-            `${chord[0]} = ${notes.join(" + ")} • ${typeLabel}`;
+            `${chord[0]} = ${chord[1].join(" + ")} • ${typeLabel}`;
 
             playNotes(
-                notes
+                chord[1]
             );
 
         });
@@ -299,27 +298,24 @@ typeLabel
 addChordButtons(
     "majorChords",
     chordData.major,
-    "major",
     "Dúrhljómur"
 );
 
 addChordButtons(
     "minorChords",
     chordData.minor,
-    "minor",
     "Mollhljómur"
 );
 
 addChordButtons(
     "sevenChords",
     chordData.seven,
-    "seven",
     "Sjöundarhljómur"
 );
 
-/* ======================
-   Hvítir takkar
-====================== */
+/* ==========================
+   WHITE KEYS
+========================== */
 
 const whiteNoteList = [
 
@@ -334,15 +330,12 @@ const whiteNoteList = [
 whiteNoteList.forEach(note=>{
 
     const key =
-    document.createElement(
-        "div"
-    );
+    document.createElement("div");
 
     key.className =
     `white-key note-${note[0]}`;
 
-    key.dataset.note =
-    note;
+    key.dataset.note = note;
 
     key.innerHTML =
     `<div>${note[0]}</div>`;
@@ -378,15 +371,13 @@ whiteNoteList.forEach(note=>{
 
     });
 
-    whiteKeys.appendChild(
-        key
-    );
+    whiteKeys.appendChild(key);
 
 });
 
-/* ======================
-   Svartir takkar
-====================== */
+/* ==========================
+   BLACK KEYS
+========================== */
 
 const blackNoteList = [
 
@@ -409,9 +400,7 @@ const blackNoteList = [
 blackNoteList.forEach(item=>{
 
     const key =
-    document.createElement(
-        "div"
-    );
+    document.createElement("div");
 
     key.className =
     `black-key note-${item.note[0]}`;
@@ -439,9 +428,7 @@ blackNoteList.forEach(item=>{
         display.textContent =
         item.note;
 
-        playNotes(
-            [item.note]
-        );
+        playNotes([item.note]);
 
     });
 
@@ -454,14 +441,10 @@ blackNoteList.forEach(item=>{
             "active"
         );
 
-        releaseNotes(
-            [item.note]
-        );
+        releaseNotes([item.note]);
 
     });
 
-    blackKeys.appendChild(
-        key
-    );
+    blackKeys.appendChild(key);
 
 });
