@@ -1,65 +1,78 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-<title>Kennslupíanó</title>
+    <title>Kennslupíanó</title>
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 
 <body>
 
-<div class="toolbar">
+    <header class="toolbar">
 
-<button id="toggleSidebar">
-☰ Hljómar
-</button>
+        <button id="toggleSidebar">
+            ☰ Hljómar
+        </button>
 
-<select id="playMode">
-<option value="normal">Normal</option>
-<option value="fade" selected>Fade</option>
-<option value="sustain">Sustain</option>
-</select>
+        <select id="playMode">
+            <option value="normal">Normal</option>
+            <option value="fade" selected>Fade</option>
+            <option value="sustain">Sustain</option>
+        </select>
 
-<label>
-Volume
-<input type="range" id="volume" min="-30" max="0" value="-8">
-</label>
+        <label class="volumeWrapper">
+            Volume
+            <input
+                type="range"
+                id="volume"
+                min="-30"
+                max="0"
+                value="-8">
+        </label>
 
-</div>
+    </header>
 
-<div id="display">
-🎹 Veldu nótu eða hljóm
-</div>
+    <section id="display">
+        🎹 Veldu nótu eða hljóm
+    </section>
 
-<div class="layout">
+    <div class="layout">
 
-<aside id="sidebar">
+        <aside id="sidebar">
 
-<h2>Dúrar</h2>
-<div id="majorChords"></div>
+            <h2>Dúrar</h2>
+            <div id="majorChords" class="chordGroup"></div>
 
-<h2>Mollar</h2>
-<div id="minorChords"></div>
+            <h2>Mollar</h2>
+            <div id="minorChords" class="chordGroup"></div>
 
-<h2>Sjöundir</h2>
-<div id="sevenChords"></div>
+            <h2>Sjöundir</h2>
+            <div id="sevenChords" class="chordGroup"></div>
 
-</aside>
+        </aside>
 
-<main class="main">
+        <main class="main">
 
-<div id="keyboard"></div>
+            <div id="keyboardContainer">
 
-</main>
+                <div id="whiteKeys"></div>
 
-</div>
+                <div id="blackKeys"></div>
 
-<script src="app.js"></script>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="app.js"></script>
 
 </body>
 </html>
