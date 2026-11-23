@@ -9,15 +9,13 @@ document.getElementById("blackKeys");
 
 let playMode = "fade";
 
-let currentHeld = [];
-
-const AudioReady = async () => {
+async function startAudio() {
 
     if (Tone.context.state !== "running") {
         await Tone.start();
     }
 
-};
+}
 
 const synth = new Tone.PolySynth(
     Tone.Synth,
@@ -63,30 +61,22 @@ document
 
 });
 
-function stopAll(){
+function stopAll() {
 
-    try{
+    try {
         synth.releaseAll();
     }
-    catch(err){}
-
-    currentHeld = [];
+    catch (e) {}
 
     clearHighlights();
 
-    document
-    .querySelectorAll(".active")
-    .forEach(el=>{
-        el.classList.remove("active");
-    });
-
 }
 
-function clearHighlights(){
+function clearHighlights() {
 
     document
     .querySelectorAll(".chord-highlight")
-    .forEach(key=>{
+    .forEach(key => {
 
         key.classList.remove(
             "chord-highlight"
@@ -96,18 +86,18 @@ function clearHighlights(){
 
 }
 
-function highlightNotes(notes){
+function highlightNotes(notes) {
 
     clearHighlights();
 
-    notes.forEach(note=>{
+    notes.forEach(note => {
 
         const key =
         document.querySelector(
         `[data-note="${note}"]`
         );
 
-        if(key){
+        if (key) {
 
             key.classList.add(
                 "chord-highlight"
@@ -119,95 +109,83 @@ function highlightNotes(notes){
 
 }
 
-function triggerNotes(notes){
+function playNotes(notes) {
 
-    if(playMode === "sustain"){
-
+    if (playMode === "sustain") {
         stopAll();
-
-        currentHeld = [...notes];
-
     }
 
     synth.triggerAttack(notes);
 
 }
 
-function releaseNotes(notes){
+function releaseNotes(notes) {
 
-    if(playMode === "normal"){
-
-        synth.triggerRelease(notes);
-
-        clearHighlights();
-
+    if (playMode === "sustain") {
+        return;
     }
 
-    if(playMode === "fade"){
-
-        synth.triggerRelease(notes);
-
-    }
+    synth.triggerRelease(notes);
 
 }
 
 const chordData = {
 
-major : [
+major: [
 
-["C",["C4","E4","G4"]],
-["D",["D4","F#4","A4"]],
-["E",["E4","G#4","B4"]],
-["F",["F4","A4","C5"]],
-["G",["G4","B4","D5"]],
-["A",["A4","C#5","E5"]],
-["B",["B4","D#5","F#5"]]
-
-],
-
-minor : [
-
-["Cm",["C4","D#4","G4"]],
-["Dm",["D4","F4","A4"]],
-["Em",["E4","G4","B4"]],
-["Fm",["F4","G#4","C5"]],
-["Gm",["G4","A#4","D5"]],
-["Am",["A4","C5","E5"]],
-["Bm",["B4","D5","F#5"]]
+["C", ["C4","E4","G4"]],
+["D", ["D4","F#4","A4"]],
+["E", ["E4","G#4","B4"]],
+["F", ["F4","A4","C5"]],
+["G", ["G4","B4","D5"]],
+["A", ["A4","C#5","E5"]],
+["B", ["B4","D#5","F#5"]]
 
 ],
 
-seven : [
+minor: [
 
-["C7",["C4","E4","G4","A#4"]],
-["D7",["D4","F#4","A4","C5"]],
-["E7",["E4","G#4","B4","D5"]],
-["F7",["F4","A4","C5","D#5"]],
-["G7",["G4","B4","D5","F5"]],
-["A7",["A4","C#5","E5","G5"]],
-["B7",["B4","D#5","F#5","A5"]]
+["Cm", ["C4","D#4","G4"]],
+["Dm", ["D4","F4","A4"]],
+["Em", ["E4","G4","B4"]],
+["Fm", ["F4","G#4","C5"]],
+["Gm", ["G4","A#4","D5"]],
+["Am", ["A4","C5","E5"]],
+["Bm", ["B4","D5","F#5"]]
+
+],
+
+seven: [
+
+["C7", ["C4","E4","G4","A#4"]],
+["D7", ["D4","F#4","A4","C5"]],
+["E7", ["E4","G#4","B4","D5"]],
+["F7", ["F4","A4","C5","D#5"]],
+["G7", ["G4","B4","D5","F5"]],
+["A7", ["A4","C#5","E5","G5"]],
+["B7", ["B4","D#5","F#5","A5"]]
 
 ]
 
 };
 
-function createChordButtons(){
+function buildChordButtons() {
 
-    createGroup(
+    createChordGroup(
         "majorChords",
         chordData.major,
         "major",
         "Dúrhljómur"
     );
 
-    createGroup(
+    createChordGroup(
         "minorChords",
         chordData.minor,
         "minor",
         "Mollhljómur"
     );
 
-    createGroup(
+    createChordGroup(
         "sevenChords",
         chordData.seven,
         "seven",
@@ -216,11 +194,11 @@ function createChordButtons(){
 
 }
 
-function createGroup(
+function createChordGroup(
 containerId,
-data,
+chords,
 cssClass,
-label
+typeName
 ){
 
     const container =
@@ -228,54 +206,43 @@ label
         containerId
     );
 
-    data.forEach(chord=>{
+    chords.forEach(chord => {
 
-        const btn =
+        const button =
         document.createElement(
             "button"
         );
 
-        btn.className =
+        button.className =
         `chordButton ${cssClass}`;
 
-        btn.textContent =
+        button.textContent =
         chord[0];
 
-        btn.addEventListener(
+        button.addEventListener(
         "pointerdown",
 
-        async ()=>{
+        async () => {
 
-            await AudioReady();
+            await startAudio();
 
             highlightNotes(
                 chord[1]
             );
 
             display.textContent =
-            `${chord[0]} = ${chord[1].join(" + ")} (${label})`;
+            `${chord[0]} = ${chord[1].join(" + ")} • ${typeName}`;
 
-            triggerNotes(
+            playNotes(
                 chord[1]
             );
 
         });
 
-        btn.addEventListener(
+        button.addEventListener(
         "pointerup",
 
-        ()=>{
-
-            releaseNotes(
-                chord[1]
-            );
-
-        });
-
-        btn.addEventListener(
-        "pointerleave",
-
-        ()=>{
+        () => {
 
             releaseNotes(
                 chord[1]
@@ -284,92 +251,72 @@ label
         });
 
         container.appendChild(
-            btn
+            button
         );
 
     });
 
 }
 
-createChordButtons();
+buildChordButtons();
+
+/* ===== Hvítir takkar ===== */
 
 const whiteNotes = [
 
-"C4","D4","E4","F4","G4","A4","B4",
-"C5","D5","E5","F5","G5","A5","B5"
+"C4","D4","E4","F4",
+"G4","A4","B4",
+
+"C5","D5","E5","F5",
+"G5","A5","B5"
 
 ];
 
-const blackNotes = [
-
-{note:"C#4",left:48},
-{note:"D#4",left:122},
-
-{note:"F#4",left:270},
-{note:"G#4",left:344},
-{note:"A#4",left:418},
-
-{note:"C#5",left:566},
-{note:"D#5",left:640},
-
-{note:"F#5",left:788},
-{note:"G#5",left:862},
-{note:"A#5",left:936}
-
-];
-
-whiteNotes.forEach(note=>{
+whiteNotes.forEach(note => {
 
     const key =
-    document.createElement(
-        "div"
-    );
+    document.createElement("div");
 
     key.className =
     `white-key note-${note[0]}`;
 
-    key.dataset.note =
-    note;
+    key.dataset.note = note;
 
-    key.textContent =
-    note;
+    key.innerHTML =
+    `<div>${note[0]}</div>`;
 
     key.addEventListener(
     "pointerdown",
 
-    async ()=>{
+    async () => {
 
-        await AudioReady();
+        await startAudio();
 
         if(playMode==="sustain"){
             stopAll();
         }
 
-        display.textContent =
-        note;
-
         key.classList.add(
             "active"
         );
 
-        triggerNotes(
-            [note]
-        );
+        display.textContent =
+        note;
+
+        playNotes([note]);
 
     });
 
     key.addEventListener(
     "pointerup",
 
-    ()=>{
+    () => {
 
         key.classList.remove(
             "active"
         );
 
-        releaseNotes(
-            [note]
-        );
+        releaseNotes([note]);
 
     });
 
@@ -378,44 +325,62 @@ whiteNotes.forEach(note=>{
 
 });
 
-blackNotes.forEach(item=>{
+/* ===== Svartir takkar ===== */
+
+const blackNotes = [
+
+{note:"C#4", pos:48},
+{note:"D#4", pos:122},
+
+{note:"F#4", pos:270},
+{note:"G#4", pos:344},
+{note:"A#4", pos:418},
+
+{note:"C#5", pos:566},
+{note:"D#5", pos:640},
+
+{note:"F#5", pos:788},
+{note:"G#5", pos:862},
+{note:"A#5", pos:936}
+
+];
+
+blackNotes.forEach(item => {
 
     const key =
-    document.createElement(
-        "div"
-    );
+    document.createElement("div");
 
     key.className =
     `black-key note-${item.note[0]}`;
 
-    key.style.left =
-    item.left + "px";
-
     key.dataset.note =
     item.note;
 
-    key.textContent =
-    item.note;
+    key.style.left =
+    `${item.pos}px`;
+
+    key.innerHTML =
+    `<div>#</div>`;
 
     key.addEventListener(
     "pointerdown",
 
-    async ()=>{
+    async () => {
 
-        await AudioReady();
+        await startAudio();
 
         if(playMode==="sustain"){
             stopAll();
         }
 
-        display.textContent =
-        item.note;
-
         key.classList.add(
             "active"
         );
 
-        triggerNotes(
+        display.textContent =
+        item.note;
+
+        playNotes(
             [item.note]
         );
 
@@ -424,7 +389,7 @@ blackNotes.forEach(item=>{
     key.addEventListener(
     "pointerup",
 
-    ()=>{
+    () => {
 
         key.classList.remove(
             "active"
