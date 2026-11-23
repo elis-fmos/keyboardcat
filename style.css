@@ -324,17 +324,42 @@ body{
 }
 
 
-.chordGroup{
+.chordRow{
 
     display:flex;
 
     align-items:center;
 
+    justify-content:center;
+
+    gap:15px;
+
+    margin-bottom:12px;
+
+}
+
+.chordLabel{
+
+    width:100px;
+
+    text-align:right;
+
+    font-family:'Montserrat',sans-serif;
+
+    font-weight:700;
+
+    font-size:24px;
+
+}
+
+.chordGrid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(7,70px);
+
     gap:10px;
-
-    margin-bottom:10px;
-
-    flex-wrap:wrap;
 
 }
 
