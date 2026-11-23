@@ -323,32 +323,18 @@ body{
 
 }
 
-.groupTitle{
-
-    text-align:center;
-
-    margin-top:15px;
-    margin-bottom:12px;
-
-    font-family:
-    'Montserrat',
-    sans-serif;
-
-    font-weight:700;
-
-}
 
 .chordGroup{
 
     display:flex;
 
-    flex-wrap:wrap;
-
-    justify-content:center;
+    align-items:center;
 
     gap:10px;
 
-    margin-bottom:25px;
+    margin-bottom:10px;
+
+    flex-wrap:wrap;
 
 }
 
@@ -379,6 +365,30 @@ body{
 .chordButton:hover{
 
     transform:translateY(-1px);
+
+}
+
+.chordRow{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:10px;
+
+}
+
+.chordLabel{
+
+    width:90px;
+
+    font-family:'Montserrat',sans-serif;
+
+    font-weight:700;
+
+    text-align:right;
 
 }
 
