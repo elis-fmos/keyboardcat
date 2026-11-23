@@ -33,15 +33,15 @@ select{
 .volumeWrapper{
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:10px;
 }
 
 #display{
     text-align:center;
     min-height:80px;
-    font-size:32px;
-    font-weight:bold;
     padding:15px;
+    font-size:28px;
+    font-weight:bold;
     background:#0f172a;
 }
 
@@ -49,6 +49,10 @@ select{
     display:flex;
     height:calc(100vh - 140px);
 }
+
+/* ======================
+   Hliðarspjald
+====================== */
 
 #sidebar{
     width:260px;
@@ -65,8 +69,8 @@ select{
 }
 
 #sidebar h2{
-    margin-bottom:10px;
     margin-top:15px;
+    margin-bottom:10px;
 }
 
 .chordGroup{
@@ -82,58 +86,110 @@ select{
     color:white;
     padding:10px;
     font-weight:bold;
-    min-width:52px;
+    min-width:58px;
 }
+
+.major{
+    background:#2563eb;
+}
+
+.minor{
+    background:#8b5cf6;
+}
+
+.seven{
+    background:#ef4444;
+}
+
+/* ======================
+   Aðalsvæði
+====================== */
 
 .main{
     flex:1;
     overflow:auto;
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+
+    padding-top:20px;
 }
+
+/* ======================
+   Píanó
+====================== */
 
 #keyboardContainer{
     position:relative;
-    display:flex;
-    justify-content:center;
-    margin-top:20px;
-    height:360px;
+
+    width:980px;
+    height:330px;
 }
+
+/* Hvítir takkar */
 
 #whiteKeys{
     display:flex;
+    position:absolute;
+    left:0;
+    top:0;
 }
 
 .white-key{
+
     width:70px;
     height:320px;
+
     background:white;
+
     border:1px solid #222;
+
     color:black;
-    font-weight:bold;
+
     display:flex;
     justify-content:center;
     align-items:flex-end;
+
     padding-bottom:12px;
+
+    font-weight:bold;
+
     user-select:none;
+    cursor:pointer;
 }
 
 .white-key.active{
+
     background:#dbeafe;
+
 }
 
+/* Svartir takkar */
+
 #blackKeys{
+
     position:absolute;
+
     top:0;
     left:0;
+
+    width:980px;
     height:320px;
-    width:100%;
+
+    pointer-events:none;
 }
 
 .black-key{
+
     position:absolute;
+
     width:45px;
     height:200px;
+
     background:black;
     color:white;
+
     border-radius:0 0 8px 8px;
 
     display:flex;
@@ -141,13 +197,27 @@ select{
     align-items:flex-end;
 
     padding-bottom:10px;
-    z-index:5;
+
+    font-size:12px;
+
     user-select:none;
+
+    cursor:pointer;
+
+    pointer-events:auto;
+
+    z-index:20;
 }
 
 .black-key.active{
+
     background:#2563eb;
+
 }
+
+/* ======================
+   Litakóðun nótna
+====================== */
 
 .note-C{
     border-bottom:10px solid #ef4444;
@@ -177,38 +247,47 @@ select{
     border-bottom:10px solid #ec4899;
 }
 
+/* ======================
+   Hljómar lýsast upp
+====================== */
+
 .chord-highlight{
+
     box-shadow:
-        inset 0 0 15px white,
-        0 0 20px white,
+        inset 0 0 20px white,
+        0 0 15px white,
         0 0 35px #60a5fa;
+
 }
 
-.major{
-    background:#2563eb;
-}
+/* ======================
+   iPad / minni skjáir
+====================== */
 
-.minor{
-    background:#8b5cf6;
-}
-
-.seven{
-    background:#ef4444;
-}
-
-@media (max-width:900px){
-
-    #sidebar{
-        position:absolute;
-        left:0;
-        top:0;
-        bottom:0;
-        z-index:20;
-    }
+@media (max-width: 1100px){
 
     #keyboardContainer{
         transform:scale(0.9);
         transform-origin:top center;
+    }
+
+}
+
+@media (max-width: 900px){
+
+    #sidebar{
+
+        position:absolute;
+
+        top:0;
+        left:0;
+        bottom:0;
+
+        z-index:100;
+    }
+
+    #keyboardContainer{
+        transform:scale(0.8);
     }
 
 }
