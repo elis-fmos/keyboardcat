@@ -1,110 +1,105 @@
-const keyboard =
-document.getElementById("keyboard");
+const display = document.getElementById("display");
+const keyboard = document.getElementById("keyboard");
 
-const display =
-document.getElementById("display");
+let playMode = "fade";
 
-let synth;
-let holdMode = false;
-
-let currentNote = null;
-let currentChord = [];
-
-const notes = [
-
-"C3","C#3","D3","D#3","E3",
-"F3","F#3","G3","G#3","A3","A#3","B3",
-
-"C4","C#4","D4","D#4","E4",
-"F4","F#4","G4","G#4","A4","A#4","B4",
-
-"C5","C#5","D5","D#5","E5",
-"F5","F#5","G5","G#5","A5","A#5","B5"
-
-];
-
-const chordGroups = {
-
-major:[
-["C","C4,E4,G4"],
-["D","D4,F#4,A4"],
-["E","E4,G#4,B4"],
-["F","F4,A4,C5"],
-["G","G4,B4,D5"],
-["A","A4,C#5,E5"],
-["B","B4,D#5,F#5"]
-],
-
-minor:[
-["Cm","C4,D#4,G4"],
-["Dm","D4,F4,A4"],
-["Em","E4,G4,B4"],
-["Fm","F4,G#4,C5"],
-["Gm","G4,A#4,D5"],
-["Am","A4,C5,E5"],
-["Bm","B4,D5,F#5"]
-],
-
-seven:[
-["C7","C4,E4,G4,A#4"],
-["D7","D4,F#4,A4,C5"],
-["E7","E4,G#4,B4,D5"],
-["F7","F4,A4,C5,D#5"],
-["G7","G4,B4,D5,F5"],
-["A7","A4,C#5,E5,G5"],
-["B7","B4,D#5,F#5,A5"]
-]
-
-};
-
-function colour(root){
-
-return{
-C:'key-C',
-D:'key-D',
-E:'key-E',
-F:'key-F',
-G:'key-G',
-A:'key-A',
-B:'key-B'
-}[root];
+const synth = new Tone.PolySynth(
+Tone.Synth,
+{
+envelope:{
+attack:0.01,
+decay:0.2,
+sustain:0.25,
+release:3
 }
-
-function createInstrument(){
-
-if(synth){
-synth.dispose();
 }
-
-synth =
-new Tone.PolySynth(
-Tone.Synth
 ).toDestination();
 
-}
+Tone.Destination.volume.value = -8;
 
-createInstrument();
+document.getElementById("volume")
+.addEventListener("input",e=>{
+Tone.Destination.volume.value=e.target.value;
+});
+
+document.getElementById("playMode")
+.addEventListener("change",e=>{
+playMode=e.target.value;
+});
+
+document.getElementById("toggleSidebar")
+.addEventListener("click",()=>{
+document
+.getElementById("sidebar")
+.classList.toggle("hidden");
+});
 
 async function startAudio(){
 
-if(Tone.context.state !== "running"){
+if(Tone.context.state!=="running"){
 await Tone.start();
 }
 
 }
 
+const chordData = {
+
+major:[
+["C",["C4","E4","G4"]],
+["D",["D4","F#4","A4"]],
+["E",["E4","G#4","B4"]],
+["F",["F4","A4","C5"]],
+["G",["G4","B4","D5"]],
+["A",["A4","C#5","E5"]],
+["B",["B4","D#5","F#5"]]
+],
+
+minor:[
+["Cm",["C4","D#4","G4"]],
+["Dm",["D4","F4","A4"]],
+["Em",["E4","G4","B4"]],
+["Fm",["F4","G#4","C5"]],
+["Gm",["G4","A#4","D5"]],
+["Am",["A4","C5","E5"]],
+["Bm",["B4","D5","F#5"]]
+],
+
+seven:[
+["C7",["C4","E4","G4","A#4"]],
+["D7",["D4","F#4","A4","C5"]],
+["E7",["E4","G#4","B4","D5"]],
+["F7",["F4","A4","C5","D#5"]],
+["G7",["G4","B4","D5","F5"]],
+["A7",["A4","C#5","E5","G5"]],
+["B7",["B4","D#5","F#5","A5"]]
+]
+
+};
+
 function clearHighlights(){
 
 document
 .querySelectorAll(".chord-highlight")
-.forEach(key =>
-key.classList.remove(
-"chord-highlight"
-));
+.forEach(key=>{
+key.classList.remove("chord-highlight");
+});
 
 }
 
-function highlightChord(notes){
+function stopAll(){
+
+try{
+synth.releaseAll();
+}catch(e){}
+
+clearHighlights();
+
+}
+
+function showChord(name,notes){
+
+display.textContent =
+`${name} = ${notes.join(" + ")}`;
 
 clearHighlights();
 
@@ -125,149 +120,90 @@ key.classList.add(
 
 }
 
-function stopEverything(){
+function createChordButtons(){
 
-if(currentNote){
-synth.triggerRelease(
-currentNote
-);
-}
-
-if(currentChord.length){
-synth.triggerRelease(
-currentChord
-);
-}
-
-currentNote = null;
-currentChord = [];
-}
-
-function createChordButton(
-name,
-notes,
-container
-){
-
-const btn =
-document.createElement("button");
-
-btn.className =
-"chord " +
-colour(name[0]);
-
-btn.textContent =
-name;
-
-container
-.appendChild(btn);
-
-btn.addEventListener(
-"pointerdown",
-async ()=>{
-
-await startAudio();
-
-if(holdMode){
-stopEverything();
-}
-
-const chordNotes =
-notes.split(",");
-
-currentChord =
-chordNotes;
-
-highlightChord(
-chordNotes
-);
-
-display.textContent =
-`${name} (${chordNotes.join(" + ")})`;
-
-synth.triggerAttack(
-chordNotes
-);
-
-}
-);
-
-btn.addEventListener(
-"pointerup",
-()=>{
-
-if(!holdMode){
-
-synth.triggerRelease(
-notes.split(",")
-);
-
-clearHighlights();
-
-}
-
-});
-
-}
-
-Object.entries(chordGroups)
+Object.keys(chordData)
 .forEach(group=>{
 
 const container =
 document.getElementById(
-group[0] + "Chords"
+group + "Chords"
 );
 
-group[1].forEach(chord=>{
+chordData[group]
+.forEach(chord=>{
 
-createChordButton(
+const btn =
+document.createElement("button");
+
+btn.className="chord";
+
+btn.textContent=chord[0];
+
+btn.addEventListener(
+"pointerdown",
+async ()=>{
+
+await startAudio();
+
+if(playMode==="sustain"){
+stopAll();
+}
+
+showChord(
 chord[0],
-chord[1],
-container
+chord[1]
 );
 
-});
+synth.triggerAttack(
+chord[1]
+);
+
+}
+);
+
+btn.addEventListener(
+"pointerup",
+()=>{
+
+if(playMode!=="sustain"){
+
+synth.triggerRelease(
+chord[1]
+);
+
+}
+
+}
+);
+
+container.appendChild(btn);
 
 });
 
-let whiteIndex = 0;
+});
+
+}
+
+createChordButtons();
+
+const notes=[
+"C3","D3","E3","F3","G3","A3","B3",
+"C4","D4","E4","F4","G4","A4","B4",
+"C5","D5","E5","F5","G5","A5","B5"
+];
 
 notes.forEach(note=>{
-
-const black =
-note.includes("#");
 
 const key =
 document.createElement("div");
 
-key.dataset.note =
-note;
-
-if(black){
-
 key.className =
-"black-key";
+`white-key note-${note[0]}`;
 
-key.style.left =
-`${whiteIndex*65-20}px`;
+key.dataset.note = note;
 
-}else{
-
-key.className =
-"white-key";
-
-whiteIndex++;
-
-}
-
-key.classList.add(
-`note-${note[0]}`
-);
-
-key.innerHTML =
-`<div>${note.replace(/[0-9]/g,"")}</div>`;
-
-keyboard.appendChild(key);
+key.textContent = note;
 
 key.addEventListener(
 "pointerdown",
@@ -275,87 +211,34 @@ async ()=>{
 
 await startAudio();
 
-if(holdMode){
-stopEverything();
+if(playMode==="sustain"){
+stopAll();
 }
 
-currentNote = note;
+display.textContent = note;
 
-display.textContent =
-note;
+key.classList.add("active");
 
-key.classList.add(
-"active"
+synth.triggerAttack(note);
+
+}
 );
-
-synth.triggerAttack(
-note
-);
-
-});
 
 key.addEventListener(
 "pointerup",
 ()=>{
 
-if(!holdMode){
+key.classList.remove("active");
 
-key.classList.remove(
-"active"
-);
+if(playMode!=="sustain"){
 
-synth.triggerRelease(
-note
-);
+synth.triggerRelease(note);
 
 }
 
-});
-
-});
-
-document
-.getElementById("menuBtn")
-.addEventListener(
-"click",
-()=>{
-
-document
-.getElementById("sidebar")
-.classList.toggle(
-"closed"
+}
 );
 
-});
-
-document
-.getElementById("sustainBtn")
-.addEventListener(
-"click",
-()=>{
-
-holdMode = !holdMode;
-
-document
-.getElementById("sustainBtn")
-.textContent =
-holdMode
-? "Hold ON"
-: "Hold OFF";
+keyboard.appendChild(key);
 
 });
-
-document
-.getElementById("volume")
-.addEventListener(
-"input",
-e=>{
-
-Tone.Destination
-.volume.value =
-e.target.value;
-
-});
-
-Tone.Destination
-.volume.value = -8;
