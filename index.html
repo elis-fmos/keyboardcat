@@ -2,8 +2,7 @@
 <html lang="is">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 <title>Kennslupíanó</title>
 
@@ -14,39 +13,30 @@ content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 <body>
 
-<div class="topbar">
+<div class="toolbar">
 
-<button id="menuBtn">
+<button id="toggleSidebar">
 ☰ Hljómar
 </button>
 
-<select id="instrument">
-<option value="piano">Piano</option>
-<option value="organ">Organ</option>
-<option value="synth">Synth</option>
-<option value="strings">Strings</option>
+<select id="playMode">
+<option value="normal">Normal</option>
+<option value="fade" selected>Fade</option>
+<option value="sustain">Sustain</option>
 </select>
 
 <label>
 Volume
-<input type="range"
-id="volume"
-min="-35"
-max="0"
-value="-8">
+<input type="range" id="volume" min="-30" max="0" value="-8">
 </label>
-
-<button id="sustainBtn">
-Hold OFF
-</button>
 
 </div>
 
 <div id="display">
-🎹
+🎹 Veldu nótu eða hljóm
 </div>
 
-<div class="app">
+<div class="layout">
 
 <aside id="sidebar">
 
@@ -63,8 +53,7 @@ Hold OFF
 
 <main class="main">
 
-<div id="keyboard"
-class="keyboard"></div>
+<div id="keyboard"></div>
 
 </main>
 
