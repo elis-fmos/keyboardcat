@@ -1,77 +1,132 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <title>Kennslupíanó</title>
+<meta charset="UTF-8">
 
-    <link rel="stylesheet" href="style.css">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<title>Kennslupíanó</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap"
+rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
 </head>
 
 <body>
 
-    <header class="toolbar">
+<header class="toolbar">
 
-        <button id="toggleSidebar">
-            ☰ Hljómar
-        </button>
+<div id="modeSelector">
 
-        <select id="playMode">
-            <option value="normal">Normal</option>
-            <option value="fade" selected>Fade</option>
-            <option value="sustain">Sustain</option>
-        </select>
+<button
+class="modeButton active"
+data-mode="fade">
 
-        <label class="volumeWrapper">
-            Volume
-            <input
-                type="range"
-                id="volume"
-                min="-30"
-                max="0"
-                value="-8">
-        </label>
+Fade
 
-    </header>
+</button>
 
-    <section id="display">
-        🎹 Veldu nótu eða hljóm
-    </section>
+<button
+class="modeButton"
+data-mode="normal">
 
-    <div class="layout">
+Normal
 
-        <aside id="sidebar">
+</button>
 
-            <h2>Dúrar</h2>
-            <div id="majorChords" class="chordGroup"></div>
+<button
+class="modeButton"
+data-mode="sustain">
 
-            <h2>Mollar</h2>
-            <div id="minorChords" class="chordGroup"></div>
+Sustain
 
-            <h2>Sjöundir</h2>
-            <div id="sevenChords" class="chordGroup"></div>
+</button>
 
-        </aside>
+</div>
 
-        <main class="main">
+<div class="volumeWrapper">
 
-            <div id="keyboardContainer">
+<label for="volume">
 
-                <div id="whiteKeys"></div>
+Hljóðstyrkur
 
-                <div id="blackKeys"></div>
+</label>
 
-            </div>
+<input
+type="range"
+id="volume"
+min="-30"
+max="0"
+value="-8">
 
-        </main>
+</div>
 
-    </div>
+</header>
 
-    <script src="app.js"></script>
+<section id="display">
+
+🎹 Veldu nótu eða hljóm
+
+</section>
+
+<main class="main">
+
+<div id="keyboardContainer">
+
+<div id="whiteKeys"></div>
+
+<div id="blackKeys"></div>
+
+</div>
+
+</main>
+
+<section id="chordArea">
+
+<h2 class="groupTitle">
+Dúrar
+</h2>
+
+<div
+id="majorChords"
+class="chordGroup">
+</div>
+
+<h2 class="groupTitle">
+Mollar
+</h2>
+
+<div
+id="minorChords"
+class="chordGroup">
+</div>
+
+<h2 class="groupTitle">
+Sjöundir
+</h2>
+
+<div
+id="sevenChords"
+class="chordGroup">
+</div>
+
+</section>
+
+<script src="app.js"></script>
 
 </body>
 </html>
